@@ -66,7 +66,7 @@ public class PastRequestDetails extends Activity {
             requestId = (String) savedInstanceState.getSerializable("requestId");
         }
 
-        textViewRequestId.setText(""+requestId);
+        textViewRequestId.setText(""+requestId.substring(0,4));
         textViewDay.setText(day);
         textViewTimeSlot.setText(timeSlot);
         textViewStatus.setText(""+status);
@@ -139,7 +139,9 @@ public class PastRequestDetails extends Activity {
             for(int i=0;i<n;i++){
                 if(myList.get(i).getRequestIdCategoryName().startsWith(requestId)){
                     mPriceListPairs.add(myList.get(i));
-                    mPriceList.add(myList.get(i).getRequestIdCategoryName()+" "+myList.get(i).getWeight());
+                    String fullreqcat = myList.get(i).getRequestIdCategoryName();
+                    int index = fullreqcat.lastIndexOf('_');
+                    mPriceList.add(fullreqcat.substring(index+1)+"       "+myList.get(i).getWeight()+" Kgs");
                     Log.d(TAG, "category name = " + myList.get(i).getRequestIdCategoryName() + ", weight = " + myList.get(i).getWeight());
                 }
             }
