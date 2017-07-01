@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ScrapApp</string>
+
+    <!-- For MyActivity -->
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="login">Login</string>
+    <string name="username_email">Username/E-mail</string>
+    <string name="passwd">Password</string>
+    <string name="signup">New User? Sign up here</string>
+
+    <!-- For SignUpPage -->
+    <string name="title_activity_sign_up_page">SignUpPage</string>
+    <string name="name">Name :</string>
+    <string name="hint_name">Enter your name</string>
+    <string name="phone">Phone</string>
+    <string name="hint_phone">Enter your phone number</string>
+    <string name="address">Address</string>
+    <string name="hint_address">Enter your pickup address</string>
+    <string name="title_activity_home_page">HomePage</string>
+    <string name="submit">Submit</string>
+    <string name="price_list">Price List</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="request_pickup">Request Pickup</string>
+    <string name="title_activity_price_list">PriceList</string>
+    <string name="title_activity_request_pickup">RequestPickup</string>
+    <string name="title_activity_account_settings">AccountSettings</string>
+    <string name="hint_username_email">Enter your email address</string>
+    <string name="hint_password">Enter a password</string>
+    <string name="confirm_passwd">Confirm Password</string>
+    <string name="hint_confirm_password">Enter same password for confirmation</string>
+    <string name="submit_request">Submit Request</string>
+    <string name="pickup_time_slot">Select Pickup Time-slot</string>
+    <string name="pickup_day">Select Pickup Day</string>
+    <string name="update">Update</string>
+    <string name="title_activity_change_password">Change Password</string>
+    <string name="current_passwd">Old Password :</string>
+    <string name="hint_current_password">Enter current password</string>
+    <string name="new_passwd">New Password</string>
+    <string name="hint_new_password">Enter New Password</string>
+    <string name="confirm_new_passwd">Confirm New Password</string>
+    <string name="hint_confirm_new_password">Confirm New Password</string>
+    <string name="change_password">Change Password</string>
+    <string name="change">Update Password</string>
+    <string name="title_activity_check_past_requests">CheckPastRequests</string>
+    <string name="title_activity_past_request_details">PastRequestDetails</string>
+    <string name="request_id">Request Id :</string>
+    <string name="status">Status :</string>
+    <string name="time_slot">Time-Slot :</string>
+    <string name="day">Day :</string>
+    <string name="default_value">Default</string>
+    <string name="terms_and_conditions"><![CDATA[Terms & Conditions]]></string>
+    <string name="contact_us">Contact Us</string>
+    <string name="past_requests">Past Requests</string>
+    <string name="title_activity_terms_and_conditions">TermsAndConditions</string>
+    <string name="title_activity_contact_us">ContactUs</string>
+    <string name="call_us">Call us at <a href="tel:+91 7259890479">+91 7259890479</a></string>
+    <string name="email_us">Email us at <a href="mailto:rohitdeepu17@gmail.com">rohitdeepu17@gmail.com</a></string>
+    <string name="office_address">Office Address</string>
+    <string name="office_address_detail">1111, Sobha Daisy,\nGreen Glen Layout,\nBellandur, Bangalore,\nPin Code : 560103</string>
+    <string name="log_out">Log-out</string>
+    <string name="about_us">About Us</string>
+    <string name="title_activity_about_us">AboutUs</string>
+    <string name="sign_in_canceled_message_format">SIGNINCANCELLED</string>
+    <string name="sign_in_failure_message_format">SIGNINFAILED</string>
+    <string name="sign_in_failure_dialog_title">SIGNINFAILDIALOG</string>
+
+</resources>

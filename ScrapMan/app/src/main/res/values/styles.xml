@@ -1,0 +1,36 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!-- Common style for the buttons on the Home Page-->
+    <style name="StyleHomePageButton">
+        <item name="android:layout_height">@dimen/image_button_width</item>
+        <item name="android:layout_width">@dimen/image_button_width</item>
+        <item name="android:background">@color/grey</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <!-- Style for the title of sections on different activities-->
+    <style name="StyleSectionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Style for horizontal linear layout   -->
+    <style name="StyleHorizontalLinearLayout">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!-- Style for small icon images -->
+    <style name="StyleSmallIcon">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+    </style>
+</resources>
