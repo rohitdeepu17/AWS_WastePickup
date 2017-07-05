@@ -29,6 +29,8 @@ public class PastRequestDetails extends Activity {
     ArrayList<PickupRequestItemsDO> mPriceListPairs = new ArrayList<PickupRequestItemsDO>();
     ArrayList<String> mPriceList  = new ArrayList<String>();
 
+    String requestIdAWS = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,29 +46,32 @@ public class PastRequestDetails extends Activity {
         listViewWeights = (ListView)findViewById(R.id.list_view_weight_details);
 
         //getting extras from intent
-        final String day, timeSlot, requestId;
-        Double status;
+        final String day, timeSlot;
+        final int requestId;
+        String status;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 day = "Default";
                 timeSlot = "Default";
-                status = 0.00;
-                requestId = "Default";
+                status = "Cancelled";
+                requestId = -1;
             } else {
                 day = extras.getString("day");
                 timeSlot = extras.getString("timeSlot");
-                status = extras.getDouble("status");
-                requestId = extras.getString("requestId");
+                status = extras.getString("status");
+                requestId = extras.getInt("requestId");
+                requestIdAWS = extras.getString("requestId_aws");
             }
         } else {
             day = (String) savedInstanceState.getSerializable("day");
             timeSlot = (String) savedInstanceState.getSerializable("timeSlot");
-            status = (Double) savedInstanceState.getSerializable("status");
-            requestId = (String) savedInstanceState.getSerializable("requestId");
+            status = (String) savedInstanceState.getSerializable("status");
+            requestId = (Integer) savedInstanceState.getSerializable("requestId");
+            requestIdAWS = (String) savedInstanceState.getSerializable("requestId_aws");
         }
 
-        textViewRequestId.setText(""+requestId.substring(0,4));
+        textViewRequestId.setText(""+requestId);
         textViewDay.setText(day);
         textViewTimeSlot.setText(timeSlot);
         textViewStatus.setText(""+status);
@@ -77,7 +82,7 @@ public class PastRequestDetails extends Activity {
             public void run() {
                 DynamoDBMapper myDynamoDbMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
                 try {
-                    FindAllScrapItemsInRequest(myDynamoDbMapper, requestId);
+                    FindAllScrapItemsInRequest(myDynamoDbMapper);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -97,7 +102,7 @@ public class PastRequestDetails extends Activity {
         // ... Put any application-specific initialization logic here ...
     }
 
-    private void FindAllScrapItemsInRequest(DynamoDBMapper mapper, String requestId)
+    private void FindAllScrapItemsInRequest(DynamoDBMapper mapper)
             throws Exception {
         Log.d(TAG, "Find all scrap categories:-");
 
@@ -137,7 +142,7 @@ public class PastRequestDetails extends Activity {
             int n = myList.size();
             Log.d(TAG,"Size of PickupRequestItemsDo = "+n);
             for(int i=0;i<n;i++){
-                if(myList.get(i).getRequestIdCategoryName().startsWith(requestId)){
+                if(myList.get(i).getRequestIdCategoryName().startsWith(requestIdAWS)){
                     mPriceListPairs.add(myList.get(i));
                     String fullreqcat = myList.get(i).getRequestIdCategoryName();
                     int index = fullreqcat.lastIndexOf('_');

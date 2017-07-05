@@ -10,7 +10,7 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 public class PickupRequestDO {
     private String _requestId;
     private String _day;
-    private Double _status;
+    private int _status;
     private String _timeSlot;
     private String _username;
 
@@ -32,11 +32,11 @@ public class PickupRequestDO {
         this._day = _day;
     }
     @DynamoDBAttribute(attributeName = "Status")
-    public Double getStatus() {
+    public int getStatus() {
         return _status;
     }
 
-    public void setStatus(final Double _status) {
+    public void setStatus(final int _status) {
         this._status = _status;
     }
     @DynamoDBAttribute(attributeName = "TimeSlot")

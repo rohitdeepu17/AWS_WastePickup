@@ -87,10 +87,13 @@ public class CheckPastRequests extends Activity {
 
         List<PickupRequestDO> latestReplies = mapper.query(PickupRequestDO.class, queryExpression);
         Log.d(TAG, "Number of categories = "+latestReplies.size());
+        int n = latestReplies.size();
+        int c=0;
         for (PickupRequestDO reply : latestReplies) {
             mPickupRequestData.add(reply);
-            mPickupRequestStrings.add("" + reply.getRequestId().substring(0, 4) + " " + reply.getDay() + " " + reply.getTimeSlot() + " " + reply.getStatus());
+            mPickupRequestStrings.add("" + (c+1) + ". " + reply.getDay() + " " + reply.getTimeSlot() + " " + getStatusString(reply.getStatus()));
             Log.d(TAG,"requestid = "+reply.getRequestId()+", day = "+reply.getDay()+", timeslot = "+ reply.getTimeSlot()+", status="+reply.getStatus());
+            c++;
         }
 
         Message messageToParent = new Message();
@@ -120,11 +123,11 @@ public class CheckPastRequests extends Activity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent = new Intent(CheckPastRequests.this, PastRequestDetails.class);
-                        intent.putExtra("requestId",mPickupRequestData.get(position).getRequestId());
+                        intent.putExtra("requestId",(position+1));
+                        intent.putExtra("requestId_aws",mPickupRequestData.get(position).getRequestId());
                         intent.putExtra("day",mPickupRequestData.get(position).getDay());
                         intent.putExtra("timeSlot",mPickupRequestData.get(position).getTimeSlot());
-                        //intent.putExtra("status",getStatusString(mPickupRequestData.get(position).getStatus()));
-                        intent.putExtra("status",mPickupRequestData.get(position).getStatus());
+                        intent.putExtra("status",getStatusString(mPickupRequestData.get(position).getStatus()));
                         startActivity(intent);
                     }
                 });
@@ -140,6 +143,8 @@ public class CheckPastRequests extends Activity {
             return "Accepted";
         else if(status == 2)
             return "Picked";
+        else if(status == 3)
+            return "Cancelled";
         else
             return "Error";
     }

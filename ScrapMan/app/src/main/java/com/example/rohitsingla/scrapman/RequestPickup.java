@@ -280,7 +280,7 @@ public class RequestPickup extends Activity {
         final PickupRequestDO myObj = new PickupRequestDO();
         myObj.setDay(day);
         myObj.setTimeSlot(timeSlot);
-        myObj.setStatus(0.00);
+        myObj.setStatus(0);
         myObj.setUsername(username);
         String requestId = UUID.randomUUID().toString();
         myObj.setRequestId(requestId);
