@@ -66,5 +66,6 @@
     <string name="sign_in_canceled_message_format">SIGNINCANCELLED</string>
     <string name="sign_in_failure_message_format">SIGNINFAILED</string>
     <string name="sign_in_failure_dialog_title">SIGNINFAILDIALOG</string>
+    <string name="cancel_request">Cancel Pickup</string>
 
 </resources>

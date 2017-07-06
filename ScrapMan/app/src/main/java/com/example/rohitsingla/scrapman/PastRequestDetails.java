@@ -1,20 +1,25 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.ScanResultPage;
 import com.example.rohitsingla.scrapman.amazonaws.mobile.AWSMobileClient;
+import com.example.rohitsingla.scrapman.amazonaws.models.nosql.PickupRequestDO;
 import com.example.rohitsingla.scrapman.amazonaws.models.nosql.PickupRequestItemsDO;
 
 import java.util.ArrayList;
@@ -25,11 +30,13 @@ public class PastRequestDetails extends Activity {
     String TAG = "PastRequestDetails";
     TextView textViewRequestId, textViewDay, textViewTimeSlot, textViewStatus;
     ListView listViewWeights ;
+    Button buttonCancelRequest;
 
     ArrayList<PickupRequestItemsDO> mPriceListPairs = new ArrayList<PickupRequestItemsDO>();
     ArrayList<String> mPriceList  = new ArrayList<String>();
 
     String requestIdAWS = null;
+    DynamoDBMapper myDynamoDbMapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,9 @@ public class PastRequestDetails extends Activity {
         textViewStatus = (TextView)findViewById(R.id.text_view_status);
 
         listViewWeights = (ListView)findViewById(R.id.list_view_weight_details);
+        buttonCancelRequest = (Button)findViewById(R.id.button_cancel_request);
+
+        myDynamoDbMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
 
         //getting extras from intent
         final String day, timeSlot;
@@ -91,6 +101,33 @@ public class PastRequestDetails extends Activity {
         Thread myThread = new Thread(runnable);
         myThread.start();
 
+        buttonCancelRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelRequest();
+                Toast.makeText(PastRequestDetails.this, "Pickup request cancelled successfully", Toast.LENGTH_SHORT);
+                Intent intent = new Intent(PastRequestDetails.this, HomePage.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    void cancelRequest() {
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run() {
+                // Retrieve the item.
+                PickupRequestDO itemRetrieved = myDynamoDbMapper.load(PickupRequestDO.class, requestIdAWS);
+
+                // Update the item.
+                itemRetrieved.setStatus(3);
+                myDynamoDbMapper.save(itemRetrieved);
+                Log.d(TAG, "request Id : "+requestIdAWS+" updated");
+            }
+        };
+        Thread myThread = new Thread(runnable);
+        myThread.start();
     }
 
     //For AmazonAWS
@@ -183,6 +220,7 @@ public class PastRequestDetails extends Activity {
 
                 // Assign adapter to ListView
                 listViewWeights.setAdapter(adapter);
+                buttonCancelRequest.setEnabled(true);
             }
         };
     };
