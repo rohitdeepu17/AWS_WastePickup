@@ -1,6 +1,8 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -31,6 +34,7 @@ import com.example.rohitsingla.scrapman.amazonaws.models.nosql.ScrapCategoryDO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +43,9 @@ public class RequestPickup extends Activity {
     ScrapDatabaseAdapter mScrapDatabaseAdapter;
 
     Button buttonSubmitRequest;
-    Spinner spinnerDay, spinnerTimeSlot;
+    Spinner spinnerTimeSlot;
+
+    TextView textViewSelectedDate;
 
     private double[] arrTemp;
     private String[] categoryNames;
@@ -49,6 +55,9 @@ public class RequestPickup extends Activity {
     ArrayList<PriceListPairs> mPriceListPairs = new ArrayList<PriceListPairs>();
     ArrayList<String> mPriceList  = new ArrayList<String>();
     DynamoDBMapper myDynamoDbMapper;
+
+    private Calendar calendar;
+    private int year, month, day;
     private static final String TAG = "RequestPickUp";
 
     @Override
@@ -59,12 +68,20 @@ public class RequestPickup extends Activity {
 
         setContentView(R.layout.activity_request_pickup);
         listViewPriceList = (ListView) findViewById(R.id.list_view_request_pickup);
+        textViewSelectedDate = (TextView) findViewById(R.id.text_view_date_selected);
 
         mScrapDatabaseAdapter = new ScrapDatabaseAdapter(this);
 
         buttonSubmitRequest = (Button)findViewById(R.id.button_submit_request);
-        spinnerDay = (Spinner)findViewById(R.id.spinner_day);
         spinnerTimeSlot = (Spinner)findViewById(R.id.spinner_time_slot);
+
+        calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        textViewSelectedDate.setText(day+"/"+month+"/"+year);
 
 
         Runnable runnable = new Runnable(){
@@ -85,7 +102,7 @@ public class RequestPickup extends Activity {
             @Override
             public void onClick(View v) {
                 try {
-                    Log.d(TAG, spinnerDay.getSelectedItem().toString()+spinnerTimeSlot.getSelectedItem().toString());
+                    Log.d(TAG, textViewSelectedDate.getText().toString()+spinnerTimeSlot.getSelectedItem().toString());
                     Log.d(TAG, "The number of categories = "+categoryNames.length);
                     double sum = 0.0;
                     for(int i=0;i<categoryNames.length;i++) {
@@ -93,7 +110,7 @@ public class RequestPickup extends Activity {
                         sum += arrTemp[i];
                     }
                     if(sum > 0.0) {
-                        requestPickup(spinnerDay.getSelectedItem().toString(), spinnerTimeSlot.getSelectedItem().toString(), HandleSharedPrefs.getSharedPrefValue(RequestPickup.this, "username"), categoryNames, arrTemp, categoryNames.length);
+                        requestPickup(textViewSelectedDate.getText().toString(), spinnerTimeSlot.getSelectedItem().toString(), HandleSharedPrefs.getSharedPrefValue(RequestPickup.this, "username"), categoryNames, arrTemp, categoryNames.length);
                         Intent intent = new Intent(RequestPickup.this, CheckPastRequests.class);
                         startActivity(intent);
                         finish();
@@ -105,6 +122,45 @@ public class RequestPickup extends Activity {
                 }
             }
         });
+
+        textViewSelectedDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(999);
+            }
+        });
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        // TODO Auto-generated method stub
+        if (id == 999) {
+            return new DatePickerDialog(this,
+                    myDateListener, year, month, day);
+        }
+        return null;
+    }
+
+    private DatePickerDialog.OnDateSetListener myDateListener = new
+            DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker arg0,
+                                      int arg1, int arg2, int arg3) {
+                    // TODO Auto-generated method stub
+                    // arg1 = year
+                    // arg2 = month
+                    // arg3 = day
+                    changeDate(arg1, arg2 + 1, arg3);
+                }
+
+
+            };
+
+    private void changeDate(int arg1, int arg2, int arg3) {
+        year = arg1;
+        month = arg2;
+        day = arg3;
+        textViewSelectedDate.setText(day+"/"+month+"/"+year);
     }
 
     //For AmazonAWS

@@ -32,8 +32,8 @@
     <string name="confirm_passwd">Confirm Password</string>
     <string name="hint_confirm_password">Enter same password for confirmation</string>
     <string name="submit_request">Submit Request</string>
-    <string name="pickup_time_slot">Select Pickup Time-slot</string>
-    <string name="pickup_day">Select Pickup Day</string>
+    <string name="pickup_time_slot">Select Time-slot</string>
+    <string name="pickup_day">Select Day</string>
     <string name="update">Update</string>
     <string name="title_activity_change_password">Change Password</string>
     <string name="current_passwd">Old Password :</string>
@@ -67,5 +67,6 @@
     <string name="sign_in_failure_message_format">SIGNINFAILED</string>
     <string name="sign_in_failure_dialog_title">SIGNINFAILDIALOG</string>
     <string name="cancel_request">Cancel Pickup</string>
+    <string name="select_date">Select Date</string>
 
 </resources>
