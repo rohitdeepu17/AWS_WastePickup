@@ -1,6 +1,7 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,17 +25,17 @@ public class ChangePassword extends Activity {
 
     EditText editTextCurrentPassword, editTextNewPassword, editTextConfirmNewPassword;
     Button buttonUpdatePassword;
-
+    Context mCtx = null;
     DynamoDBMapper myDynamoDbMapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_change_password);
+        mCtx = ChangePassword.this;
         //AmazonAWS
         initializeApplication();
         myDynamoDbMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-        setContentView(R.layout.activity_change_password);
-
         mScrapDatabaseAdapter = new ScrapDatabaseAdapter(this);
 
         editTextCurrentPassword = (EditText) findViewById(R.id.edit_text_current_password);
@@ -45,53 +46,58 @@ public class ChangePassword extends Activity {
         buttonUpdatePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //update the password in database with proper error handling
-                String currentPassword = editTextCurrentPassword.getText().toString();
-                String newPassword = editTextNewPassword.getText().toString();
-                String confirmNewPassword = editTextConfirmNewPassword.getText().toString();
+                if(NetworkStateInfo.isOnline(mCtx)){
+                    //update the password in database with proper error handling
+                    String currentPassword = editTextCurrentPassword.getText().toString();
+                    String newPassword = editTextNewPassword.getText().toString();
+                    String confirmNewPassword = editTextConfirmNewPassword.getText().toString();
 
-                boolean flag = true;
+                    boolean flag = true;
 
-                //check if any field is empty or filled with only spaces
-                if(currentPassword.length() == 0 || newPassword.length() == 0 || confirmNewPassword.length() == 0 ||
-                        currentPassword.trim().length() == 0|| newPassword.trim().length() == 0 || confirmNewPassword.trim().length() == 0){
-                    Toast.makeText(ChangePassword.this, "All the above fields are mandatory", Toast.LENGTH_SHORT).show();
-                    flag = false;
-                }
-
-                //verify current password, using verifyLoginCredentials function
-                try {
-                    if(flag && !currentPassword.contentEquals(HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd").toString())){
-                        Log.d(TAG, "current password from shared pref = "+HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd")+", size = "+HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd").toString().length());
-                        Log.d(TAG, "current password from user entered= "+currentPassword+", size = "+currentPassword.length());
-                        Toast.makeText(ChangePassword.this, "Sorry, You have entered wrong current password", Toast.LENGTH_SHORT).show();
+                    //check if any field is empty or filled with only spaces
+                    if(currentPassword.length() == 0 || newPassword.length() == 0 || confirmNewPassword.length() == 0 ||
+                            currentPassword.trim().length() == 0|| newPassword.trim().length() == 0 || confirmNewPassword.trim().length() == 0){
+                        Toast.makeText(ChangePassword.this, "All the above fields are mandatory", Toast.LENGTH_SHORT).show();
                         flag = false;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                //verify if both password and confirmNewPassword match
-                if(flag && !newPassword.equals(confirmNewPassword)){
-                    Toast.makeText(ChangePassword.this, "Sorry, Password and Confirm Password do not match", Toast.LENGTH_SHORT).show();
-                    flag = false;
-                }
-
-                //if no error so far, update password for this user
-                if(flag){
+                    //verify current password, using verifyLoginCredentials function
                     try {
-                        String username = HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "username");
-                        updatePassword(username, newPassword);
-                        //update shared pref also
-                        HandleSharedPrefs.saveUsernameSharedPref(ChangePassword.this, "username",username , "passwd", newPassword);
-                        Toast.makeText(ChangePassword.this, "Password Changed Successfully", Toast.LENGTH_SHORT);
-                        Intent intent = new Intent(ChangePassword.this, HomePage.class);
-                        startActivity(intent);
-                        finish();
-                    } catch (SQLException e) {
+                        if(flag && !currentPassword.contentEquals(HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd").toString())){
+                            Log.d(TAG, "current password from shared pref = "+HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd")+", size = "+HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "passwd").toString().length());
+                            Log.d(TAG, "current password from user entered= "+currentPassword+", size = "+currentPassword.length());
+                            Toast.makeText(ChangePassword.this, "Sorry, You have entered wrong current password", Toast.LENGTH_SHORT).show();
+                            flag = false;
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
+
+                    //verify if both password and confirmNewPassword match
+                    if(flag && !newPassword.equals(confirmNewPassword)){
+                        Toast.makeText(ChangePassword.this, "Sorry, Password and Confirm Password do not match", Toast.LENGTH_SHORT).show();
+                        flag = false;
+                    }
+
+                    //if no error so far, update password for this user
+                    if(flag){
+                        try {
+                            String username = HandleSharedPrefs.getSharedPrefValue(ChangePassword.this, "username");
+                            updatePassword(username, newPassword);
+                            //update shared pref also
+                            HandleSharedPrefs.saveUsernameSharedPref(ChangePassword.this, "username",username , "passwd", newPassword);
+                            Toast.makeText(ChangePassword.this, "Password Changed Successfully", Toast.LENGTH_SHORT);
+                            Intent intent = new Intent(ChangePassword.this, HomePage.class);
+                            startActivity(intent);
+                            finish();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }

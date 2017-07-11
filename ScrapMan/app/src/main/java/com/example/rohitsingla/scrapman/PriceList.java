@@ -1,6 +1,7 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,7 +30,7 @@ public class PriceList extends Activity {
 
     ArrayList<PriceListPairs> mPriceListPairs = new ArrayList<PriceListPairs>();
     ArrayList<String> mPriceList  = new ArrayList<String>();
-
+    Context mCtx=null;
     ScrapDatabaseAdapter mScrapDatabaseAdapter;
 
     @Override
@@ -38,6 +39,7 @@ public class PriceList extends Activity {
         //AmazonAWS
         initializeApplication();
         setContentView(R.layout.activity_price_list);
+        mCtx = PriceList.this;
 
         mScrapDatabaseAdapter = new ScrapDatabaseAdapter(this);
 
@@ -155,7 +157,7 @@ public class PriceList extends Activity {
                 // Third parameter - ID of the TextView to which the data is written
                 // Forth - the Array of data
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(PriceList.this,
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(mCtx,
                         android.R.layout.simple_list_item_1, android.R.id.text1, mPriceList);
 
 

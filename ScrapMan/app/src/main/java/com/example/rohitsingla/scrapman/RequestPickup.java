@@ -3,6 +3,7 @@ package com.example.rohitsingla.scrapman;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,6 +56,8 @@ public class RequestPickup extends Activity {
     ArrayList<PriceListPairs> mPriceListPairs = new ArrayList<PriceListPairs>();
     ArrayList<String> mPriceList  = new ArrayList<String>();
     DynamoDBMapper myDynamoDbMapper;
+    
+    Context mCtx = null;
 
     private Calendar calendar;
     private int year, month, day;
@@ -67,6 +70,7 @@ public class RequestPickup extends Activity {
         initializeApplication();
 
         setContentView(R.layout.activity_request_pickup);
+        mCtx = RequestPickup.this;
         listViewPriceList = (ListView) findViewById(R.id.list_view_request_pickup);
         textViewSelectedDate = (TextView) findViewById(R.id.text_view_date_selected);
 
@@ -101,24 +105,28 @@ public class RequestPickup extends Activity {
         buttonSubmitRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Log.d(TAG, textViewSelectedDate.getText().toString()+spinnerTimeSlot.getSelectedItem().toString());
-                    Log.d(TAG, "The number of categories = "+categoryNames.length);
-                    double sum = 0.0;
-                    for(int i=0;i<categoryNames.length;i++) {
-                        Log.d(TAG, "The weight at index " + i + " = " + arrTemp[i]);
-                        sum += arrTemp[i];
+                if(NetworkStateInfo.isOnline(mCtx)){
+                    try {
+                        Log.d(TAG, textViewSelectedDate.getText().toString()+spinnerTimeSlot.getSelectedItem().toString());
+                        Log.d(TAG, "The number of categories = "+categoryNames.length);
+                        double sum = 0.0;
+                        for(int i=0;i<categoryNames.length;i++) {
+                            Log.d(TAG, "The weight at index " + i + " = " + arrTemp[i]);
+                            sum += arrTemp[i];
+                        }
+                        if(sum > 0.0) {
+                            requestPickup(textViewSelectedDate.getText().toString(), spinnerTimeSlot.getSelectedItem().toString(), HandleSharedPrefs.getSharedPrefValue(mCtx, "username"), categoryNames, arrTemp, categoryNames.length);
+                            Intent intent = new Intent(mCtx, CheckPastRequests.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            Toast.makeText(mCtx, "Sorry, you have to request pickup for at least one category", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
-                    if(sum > 0.0) {
-                        requestPickup(textViewSelectedDate.getText().toString(), spinnerTimeSlot.getSelectedItem().toString(), HandleSharedPrefs.getSharedPrefValue(RequestPickup.this, "username"), categoryNames, arrTemp, categoryNames.length);
-                        Intent intent = new Intent(RequestPickup.this, CheckPastRequests.class);
-                        startActivity(intent);
-                        finish();
-                    }else{
-                        Toast.makeText(RequestPickup.this, "Sorry, you have to request pickup for at least one category", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
                 }
             }
         });

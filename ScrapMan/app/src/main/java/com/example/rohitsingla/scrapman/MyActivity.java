@@ -1,6 +1,7 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +26,7 @@ public class MyActivity extends Activity {
     Button buttonLogin, buttonSignUp;
 
     ScrapDatabaseAdapter mScrapDatabaseAdapter;
+    Context mCtx=null;
 
     String username, passwd;
     String TAG = "MyActivity";
@@ -51,6 +53,7 @@ public class MyActivity extends Activity {
         //AmazonAWS
         initializeApplication();
         setContentView(R.layout.activity_my);
+        mCtx = MyActivity.this;
 
         /* TODO : Why onCreate is being called for an activity instance already on the stack?
          * Reason : new intent launched
@@ -72,12 +75,12 @@ public class MyActivity extends Activity {
         //check the values of shared preferences username and password :
         //If they are not null and matches some user credentials in the database(need to check this also,
         //because user might have changed his credentials through website), directly launch HomePage with sharedPref credentials
-        username = HandleSharedPrefs.getSharedPrefValue(MyActivity.this, "username");
-        passwd = HandleSharedPrefs.getSharedPrefValue(MyActivity.this, "passwd");
+        username = HandleSharedPrefs.getSharedPrefValue(mCtx, "username");
+        passwd = HandleSharedPrefs.getSharedPrefValue(mCtx, "passwd");
 
         try {
             if(username != null && username.length()!=0 && passwd != null && passwd.length()!=0 && mScrapDatabaseAdapter.verifyLoginCredentials(username, passwd)){
-                Intent intent = new Intent(MyActivity.this,HomePage.class);
+                Intent intent = new Intent(mCtx,HomePage.class);
                 startActivity(intent);
                 finish();
             }
@@ -96,21 +99,26 @@ public class MyActivity extends Activity {
             public void onClick(View v) {
                 //login with proper error handling
                 //if correct credentials, take user to HomePage
-                try {
-                    username = editTextUsername.getText().toString();
-                    passwd = editTextPassword.getText().toString();
-                    Log.d(TAG, "username : "+username+", password : "+passwd);
-                    if(username != null && username.length()!=0 && passwd != null && passwd.length()!=0)
-                    {
-                        verifyLoginCredentials(username, passwd);
+                if(NetworkStateInfo.isOnline(mCtx)){
+                    try {
+                        username = editTextUsername.getText().toString();
+                        passwd = editTextPassword.getText().toString();
+                        Log.d(TAG, "username : "+username+", password : "+passwd);
+                        if(username != null && username.length()!=0 && passwd != null && passwd.length()!=0)
+                        {
+                            verifyLoginCredentials(username, passwd);
+                        }
+                        else
+                        {
+                            Toast.makeText(mCtx,"Incorrect username/password",Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    else
-                    {
-                        Toast.makeText(MyActivity.this,"Incorrect username/password",Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
                 }
+
                 //else show toast
             }
         });
@@ -118,8 +126,12 @@ public class MyActivity extends Activity {
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mIntent = new Intent(MyActivity.this, SignUpPage.class);
-                startActivity(mIntent);
+                if(NetworkStateInfo.isOnline(mCtx)) {
+                    Intent mIntent = new Intent(mCtx, SignUpPage.class);
+                    startActivity(mIntent);
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -234,17 +246,24 @@ public class MyActivity extends Activity {
             if (msg.what == 0) {
                 if(msg.getData().getBoolean("success")){
                     //successfully login the user
-                    HandleSharedPrefs.saveUsernameSharedPref(MyActivity.this, "username", username, "passwd", passwd);
-                    Intent intent = new Intent(MyActivity.this,HomePage.class);
+                    HandleSharedPrefs.saveUsernameSharedPref(mCtx, "username", username, "passwd", passwd);
+                    Intent intent = new Intent(mCtx,HomePage.class);
                     //intent.putExtra("username", editTextUsername.getText().toString());
                     startActivity(intent);
                     finish();
                 }else{
-                    Toast.makeText(MyActivity.this,"Incorrect username/password",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mCtx,"Incorrect username/password",Toast.LENGTH_SHORT).show();
                 }
             }
         };
     };
+
+    /*public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }*/
 
 
 

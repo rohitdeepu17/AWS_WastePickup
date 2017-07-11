@@ -1,6 +1,7 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,16 +9,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 
 public class HomePage extends Activity {
     Button buttonPriceList, buttonRequestPickup, buttonAccountSettings, buttonCheckPastRequests, buttonTnCs, buttonContactUs, buttonAboutUs, buttonLogOut;
-
+    Context mCtx = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-
+        mCtx = HomePage.this;
         Drawable img;
 
         buttonPriceList = (Button)findViewById(R.id.button_price_list);
@@ -63,39 +65,55 @@ public class HomePage extends Activity {
         buttonPriceList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, PriceList.class);
-                startActivity(intent);
+                if(NetworkStateInfo.isOnline(mCtx)) {
+                    Intent intent = new Intent(mCtx, PriceList.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(mCtx, "Sorry! Not connected to internet", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         buttonRequestPickup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, RequestPickup.class);
-                startActivity(intent);
+                if(NetworkStateInfo.isOnline(mCtx)){
+                    Intent intent = new Intent(mCtx, RequestPickup.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         buttonAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, AccountSettings.class);
-                startActivity(intent);
+                if(NetworkStateInfo.isOnline(mCtx)) {
+                    Intent intent = new Intent(mCtx, AccountSettings.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         buttonCheckPastRequests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, CheckPastRequests.class);
-                startActivity(intent);
+                if(NetworkStateInfo.isOnline(mCtx)) {
+                    Intent intent = new Intent(mCtx, CheckPastRequests.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         buttonTnCs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, TermsAndConditions.class);
+                Intent intent = new Intent(mCtx, TermsAndConditions.class);
                 startActivity(intent);
             }
         });
@@ -103,7 +121,7 @@ public class HomePage extends Activity {
         buttonContactUs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, ContactUs.class);
+                Intent intent = new Intent(mCtx, ContactUs.class);
                 startActivity(intent);
             }
         });
@@ -111,7 +129,7 @@ public class HomePage extends Activity {
         buttonAboutUs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePage.this, AboutUs.class);
+                Intent intent = new Intent(mCtx, AboutUs.class);
                 startActivity(intent);
             }
         });
@@ -120,9 +138,9 @@ public class HomePage extends Activity {
             @Override
             public void onClick(View v) {
                 //make the shared preferences null
-                HandleSharedPrefs.saveUsernameSharedPref(HomePage.this, "username", null, "passwd", null);
+                HandleSharedPrefs.saveUsernameSharedPref(mCtx, "username", null, "passwd", null);
                 //go to login page
-                Intent intent = new Intent(HomePage.this, MyActivity.class);
+                Intent intent = new Intent(mCtx, MyActivity.class);
                 startActivity(intent);
             }
         });

@@ -1,6 +1,7 @@
 package com.example.rohitsingla.scrapman;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.example.rohitsingla.scrapman.amazonaws.mobile.AWSMobileClient;
@@ -27,13 +29,15 @@ public class AccountSettings extends Activity {
 
     TextView textViewUsername;
     DynamoDBMapper myDynamoDbMapper;
-
+    Context mCtx = null;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //AmazonAWS
         initializeApplication();
         setContentView(R.layout.activity_account_settings);
+        mCtx = AccountSettings.this;
 
         textViewUsername = (TextView)findViewById(R.id.text_view_username_email);
         editTextName = (EditText)findViewById(R.id.edit_text_name);
@@ -42,7 +46,7 @@ public class AccountSettings extends Activity {
         buttonUpdate = (Button)findViewById(R.id.button_update);
         buttonChangePassword = (Button)findViewById(R.id.button_change_password);
 
-        textViewUsername.setText(HandleSharedPrefs.getSharedPrefValue(AccountSettings.this,"username"));
+        textViewUsername.setText(HandleSharedPrefs.getSharedPrefValue(mCtx,"username"));
 
         try {
             Runnable runnable = new Runnable(){
@@ -53,7 +57,7 @@ public class AccountSettings extends Activity {
                     //ScrapCategoryDO myScrapCategoryObj1 = AWSMobileClient.defaultMobileClient().getDynamoDBMapper().load(ScrapCategoryDO.class,"Plastic");
 
                     myDynamoDbMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-                    UserDO myObj = myDynamoDbMapper.load(UserDO.class, HandleSharedPrefs.getSharedPrefValue(AccountSettings.this,"username"));
+                    UserDO myObj = myDynamoDbMapper.load(UserDO.class, HandleSharedPrefs.getSharedPrefValue(mCtx,"username"));
 
                     Message messageToParent = new Message();
                     messageToParent.what = 0;
@@ -78,14 +82,18 @@ public class AccountSettings extends Activity {
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                        updateProfile(HandleSharedPrefs.getSharedPrefValue(AccountSettings.this, "username"), editTextName.getText().toString(), editTextPhone.getText().toString(), editTextAddress.getText().toString());
-                        Intent intent = new Intent(AccountSettings.this, HomePage.class);
+                if(NetworkStateInfo.isOnline(mCtx)){
+                    try {
+                        updateProfile(HandleSharedPrefs.getSharedPrefValue(mCtx, "username"), editTextName.getText().toString(), editTextPhone.getText().toString(), editTextAddress.getText().toString());
+                        Intent intent = new Intent(mCtx, HomePage.class);
                         startActivity(intent);
                         finish();
 
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Toast.makeText(mCtx, "Sorry! Not connected to internet", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -93,9 +101,13 @@ public class AccountSettings extends Activity {
         buttonChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AccountSettings.this, ChangePassword.class);
-                startActivity(intent);
-                finish();
+                if(NetworkStateInfo.isOnline(mCtx)) {
+                    Intent intent = new Intent(mCtx, ChangePassword.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Toast.makeText(mCtx,"Sorry! Not connected to internet",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
